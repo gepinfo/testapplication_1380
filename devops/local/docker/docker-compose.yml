@@ -169,7 +169,7 @@ services:
       - authproxy
       - securitymanager
       - systemcredentialmanager
-      - systementry
+      # - systementry
       - employeemanagement
 
     networks:
@@ -246,26 +246,26 @@ services:
       - testapplication_1380_net
 
 
-  systementry: 
-    build: ../../../application/services/custom_services/systementry
-    image: systementry-1380
-    container_name: systementry-1380
-    ports: 
-      - 8010:8010
-    env_file: .env
-    depends_on:
-      - mongo
-    networks:
-      - testapplication_1380_net
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: 0.0.0.0:24224
-        fluentd-async-connect: "true"
-        tag: fluent
-    mem_limit: 300m
-    mem_reservation: 150m
-    cpus: 0.2
+  # systementry: 
+  #   build: ../../../application/services/custom_services/systementry
+  #   image: systementry-1380
+  #   container_name: systementry-1380
+  #   ports: 
+  #     - 8010:8010
+  #   env_file: .env
+  #   depends_on:
+  #     - mongo
+  #   networks:
+  #     - testapplication_1380_net
+  #   logging:
+  #     driver: "fluentd"
+  #     options:
+  #       fluentd-address: 0.0.0.0:24224
+  #       fluentd-async-connect: "true"
+  #       tag: fluent
+  #   mem_limit: 300m
+  #   mem_reservation: 150m
+  #   cpus: 0.2
 
   employeemanagement: 
     build: ../../../application/services/custom_services/employeemanagement

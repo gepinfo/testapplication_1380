@@ -9,6 +9,8 @@ export class service extends React.Component {
 
 
    Create=(employeemanagement:any) => {
+    console.log('employeemanagement',employeemanagement);
+    
         let jwt_token = sessionStorage.getItem('JwtToken');
  	 	return axios.post(Web() + '/employeemanagement' + `?jwt_token=${jwt_token}`, employeemanagement);
     }

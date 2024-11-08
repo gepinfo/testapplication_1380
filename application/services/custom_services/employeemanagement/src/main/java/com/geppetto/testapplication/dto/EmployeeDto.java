@@ -13,7 +13,7 @@ import lombok.Builder;
 @NoArgsConstructor
 public class EmployeeDto {
 
-    @NotBlank(message = "id cannot be null or empty")
+   
     private String id;
      
     @NotBlank(message = "name cannot be null or empty")  

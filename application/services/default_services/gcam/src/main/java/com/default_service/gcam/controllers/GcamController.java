@@ -1,18 +1,25 @@
 package com.default_service.gcam.controllers;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.default_service.gcam.dto.RequestDto;
 import com.default_service.gcam.dto.ResourceRequestDto;
 import com.default_service.gcam.dto.ResourceResponseDto;
 import com.default_service.gcam.service.GcamService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/")
@@ -26,6 +33,7 @@ public class GcamController {
     public
     ResponseEntity<List<ResourceResponseDto>> getResourceAuthorizationsByRole(@RequestBody RequestDto requestDto) {
         log.info("Enter into getResourceAuthorizationsByRole:Gcam ");
+        System.out.println("gcamresponse----->"+gcamService.getResourceAuthorizationByRole(requestDto));
         return gcamService.getResourceAuthorizationByRole(requestDto);
     }
 

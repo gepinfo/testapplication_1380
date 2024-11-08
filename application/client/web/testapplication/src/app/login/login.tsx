@@ -28,20 +28,28 @@ const Login = (props: any) => {
   const onSubmit = async (e: any) => {
     e.preventDefault();
     const data = JSON.stringify(formData);
+    console.log('data',data);
+    
     login(data).then((logindatas: any) => {
+
+      console.log('logindatas',logindatas.data.id
+      );
+
       sessionStorage.setItem(
         "Name",
-        logindatas.data.Userdetails.firstname +
+        logindatas.data.firstname +
           " " +
-          logindatas.data.Userdetails.lastname
+          logindatas.data.lastname
       );
-      // if(logindatas.data.Userdetails.avatar !== null){
+      // if(logindatas.data.avatar !== null){
 
-      //   sessionStorage.setItem('Image', logindatas.data.Userdetails.avatar);
+      //   sessionStorage.setItem('Image', logindatas.data.avatar);
       //       }else {
-      let name = logindatas.data.Userdetails.firstname;
-      id = logindatas.data.Userdetails._id;
-      let image = `../../assets/profile/${name.length}.png`;
+      let name = logindatas.data.firstname;
+      id = logindatas.data.id;
+     console.log('id------',id);
+     
+      let image = `../../assets/profile/${name}.png`;
       sessionStorage.setItem("Image", image);
       // }
       let tokenError = logindatas.data.error;
@@ -50,31 +58,32 @@ const Login = (props: any) => {
       } else {
         if (tokenError !== undefined) {
           if (tokenError.name === "TokenExpiredError") {
-            consent();
+            consent(logindatas.data.id);
           }
         } else {
           if (logindatas.data.Access) {
-            
-            consent();
+            consent(logindatas.data.id);
           } else {
-            id = logindatas.data.Userdetails._id;
-            sessionStorage.setItem("Id", logindatas.data.Userdetails._id);
+           id = logindatas.data.id;
+            sessionStorage.setItem("Id", logindatas.data.Userdetails.id);
             sessionStorage.setItem(
               "lastLoggedInTime",
-              logindatas.data.Userdetails.loggedinDate
+              logindatas.data.loggedinDate
             );
-            sessionStorage.setItem("email", logindatas.data.Userdetails.email);
+            sessionStorage.setItem("email", logindatas.data.Userdetails.id);
             sessionStorage.setItem(
               "JwtToken",
-              logindatas.data.Userdetails.Idtoken
+              logindatas.data.idtoken
             );
             if (
-              logindatas.data.Userdetails.Idtoken === null ||
-              logindatas.data.Userdetails.Idtoken === ""
+              logindatas.data.idtoken === null ||
+              logindatas.data.idtoken === ""
             ) {
-              consent();
+              consent(logindatas.data.id);
             } else {
               window.location.href = "/sefscreen";
+              console.log('calll else');
+              
             }
           }
         }
@@ -83,34 +92,108 @@ const Login = (props: any) => {
     });
   };
 
-  const consent = () => {
+  const consent = (id:any) => {
+      
     const temp = {
+      id: id,
       submit: "Allow access",
       scope: openId,
-      id: id,
     };
-
     Consent(temp).then((consentValue: any) => {
-      if (consentValue.data.Access !== undefined) {
-        let accessLevel = consentValue.data.Access[0];
-        permission.push(accessLevel);
-        sessionStorage.setItem("Access", JSON.stringify(permission));
+      const { data } = consentValue; // Extract `data` for easier access
+      console.log('consentValue', consentValue);
+      console.log('consentValuedata', data);
+      console.log('consentValueAccess', data?.Access);
+  
+      // Check if 'Access' exists and is valid
+      if (data?.Access?.length > 0) {
+          const accessLevel = data.Access[0];
+          console.log('accessLevel', accessLevel);
+  
+          // Assuming permission is defined elsewhere in the scope
+          permission.push(accessLevel);
+          sessionStorage.setItem("Access", JSON.stringify(permission));
       }
-      let screen: any = sessionStorage.getItem("Access");
+  
+      // Instead of manually declaring 'screen', directly use the correct structure
+      const defaultScreens = [
+          { "screenname": "sefscreen" },
+          { "screenname": "home" },
+          { "screenname": "SaveEmployeeScreen" },
+          { "screenname": "listemployeescreen" },
+          { "screenname": "updateemployee" }
+      ];
+  
+      // Parse and access screens from session storage or use the default
+      const screens = JSON.parse(sessionStorage.getItem("screens") || JSON.stringify(defaultScreens))[0];
+      const accessScreen = screens?.[Object.keys(screens)[0]]?.screens || [];
+      sessionStorage.setItem("screens", JSON.stringify(accessScreen));
+  
+      // Extract user details and log them
+      const { Userdetails } = data;
+      console.log('userDetails', Userdetails);
+  
+      if (Userdetails) {
+          const { id, loggedinDate, email, idtoken } = Userdetails;
+  
+          // Store user session information
+          sessionStorage.setItem("Id", id);
+          sessionStorage.setItem("lastLoggedInTime", loggedinDate);
+          sessionStorage.setItem("email", email);
+          sessionStorage.setItem("JwtToken", idtoken);
+  
+          // Redirect to the appropriate screen
+          window.location.href = "/sefscreen";
+      }
+  });
+  
 
-      let screens = JSON.parse(screen)[0].access[0];
-      let accessscreen = screens[Object.keys(screens)[0]].screens;
-      sessionStorage.setItem("screens", JSON.stringify(accessscreen));
-      userDetails = consentValue.data.Userdetails;
-      let id = userDetails._id;
-      let lastLoggedInTime = userDetails.loggedinDate;
+    // Consent(temp).then((consentValue: any) => {
+    //    console.log('consentValue',consentValue);
+    //    console.log('consentValuedata',consentValue.data);
+    //    console.log('consentValueaccess',consentValue.data.Access);
+       
+    //   if (consentValue.data.Access !== undefined) {
+    //     let accessLevel = consentValue.data.Access[0];
+    //     console.log('accessLevel',accessLevel);
+        
+    //     permission.push(accessLevel);
+    //     sessionStorage.setItem("Access", JSON.stringify(permission));
+    //   }
+    //   // let screen: any = sessionStorage.getItem("Access");
+    //   let screen:any =  [[
+    //     {
+    //         "screenname": "sefscreen"
+    //     },
+    //     {
+    //         "screenname": "home"
+    //     },
+    //     {
+    //         "screenname": "saveemployeescreen"
+    //     },
+    //     {
+    //         "screenname": "listemployeescreen"
+    //     },
+    //     {
+    //         "screenname": "updateemployee"
+    //     }
+        
+    // ] ]
+    //   let screens = JSON.parse(screen)[0];
+    //   let accessscreen = screens[Object.keys(screens)[0]].screens;
+    //   sessionStorage.setItem("screens", JSON.stringify(accessscreen));
+    //   userDetails = consentValue.data.Userdetails;
+    //   console.log('userDetails',userDetails);
+      
+    //   let id = userDetails.id;
+    //   let lastLoggedInTime = userDetails.loggedinDate;
 
-      window.location.href = "/sefscreen";
-      sessionStorage.setItem("Id", id);
-      sessionStorage.setItem("lastLoggedInTime", lastLoggedInTime);
-      sessionStorage.setItem("email", userDetails.email);
-      sessionStorage.setItem("JwtToken", userDetails.Idtoken);
-    });
+    //   window.location.href = "/sefscreen";
+    //   sessionStorage.setItem("Id", id);
+    //   sessionStorage.setItem("lastLoggedInTime", lastLoggedInTime);
+    //   sessionStorage.setItem("email", userDetails.email);
+    //   sessionStorage.setItem("JwtToken", userDetails.idtoken);
+    // });
   };
   return (
     <div className="background-images">

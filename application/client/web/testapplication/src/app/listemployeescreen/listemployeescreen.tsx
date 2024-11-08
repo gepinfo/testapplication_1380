@@ -38,7 +38,9 @@ class Listemployeescreen extends React.Component<any, any> {
     }
     GetAllValues  () {
     this.test.GetAllValues().then((data:any) => {
-    this.setState({rowData:data.data})
+        console.log('data----',data.data.body.content);
+        
+    this.setState({rowData:data.data.body.content})
     },
     (error:any) => {
     console.log('Error', error);

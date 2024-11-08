@@ -13,7 +13,7 @@ class SaveEmployeeScreen extends React.Component<any, any> {
     employee : {
     name: '',
     empid: '',
-    role: '',
+    role: ''
     },
     
     rowData :[]
@@ -27,12 +27,18 @@ class SaveEmployeeScreen extends React.Component<any, any> {
     }
 
 
-    componentDidMount() {
-    this.state.employee.created_by = sessionStorage.getItem('email')||'{}';
-    }
+    // componentDidMount() {
+    // this.state.employee.created_by = sessionStorage.getItem('email')||'{}';
+    // }
     Create  () {
-    this.test.Create(this.state.employeemanagement).then((data:any) => {
-    
+        console.log('this.state.employee',this.state.employee);
+        
+    this.test.Create(this.state.employee).then((data:any) => {
+        this.setState({ employee : {
+            name: '',
+            empid: '',
+            role: ''
+            } })
     },
     (error:any) => {
     console.log('Error', error);

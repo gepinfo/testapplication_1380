@@ -30,6 +30,14 @@ class Updateemployee extends React.Component<any, any> {
     componentDidMount() {
     this.state.employee.created_by = sessionStorage.getItem('email')||'{}';
     }
+    Update  () {
+        this.test.Update(this.state.employeemanagement).then((data:any) => {
+        
+        },
+        (error:any) => {
+        console.log('Error', error);
+        });
+        }
 
     render(){
     return(

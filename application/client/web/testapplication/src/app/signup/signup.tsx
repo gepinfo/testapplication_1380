@@ -22,8 +22,8 @@ const Signup = (props: any) => {
   const onSubmit = async (e: any) => {
     e.preventDefault();
     register(formData, (res: any) => {
-      console.log(res.data);
-      if (res.data._id) {
+      console.log("res.body",res.data.body);
+      if (res.data.body.id) {
         window.location.href = "/login";
       } else {
         console.log("sign in err", res.data);

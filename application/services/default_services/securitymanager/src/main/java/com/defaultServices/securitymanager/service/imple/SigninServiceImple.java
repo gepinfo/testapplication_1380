@@ -1,16 +1,13 @@
 package com.defaultServices.securitymanager.service.imple;
 
-import com.defaultServices.securitymanager.Exception.BusinessException;
-import com.defaultServices.securitymanager.Exception.ErrorCode;
-import com.defaultServices.securitymanager.configuration.JwtService;
-import com.defaultServices.securitymanager.dao.ConstentDao;
-import com.defaultServices.securitymanager.dao.SigninDao;
-import com.defaultServices.securitymanager.dto.*;
-import com.defaultServices.securitymanager.model.Role;
-import com.defaultServices.securitymanager.model.User;
-import com.defaultServices.securitymanager.service.SigninService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,9 +15,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import com.defaultServices.securitymanager.Exception.BusinessException;
+import com.defaultServices.securitymanager.Exception.ErrorCode;
+import com.defaultServices.securitymanager.configuration.JwtService;
+import com.defaultServices.securitymanager.dao.ConstentDao;
+import com.defaultServices.securitymanager.dao.SigninDao;
+import com.defaultServices.securitymanager.dto.RoleRequestDto;
+import com.defaultServices.securitymanager.dto.RoleResponseDto;
+import com.defaultServices.securitymanager.dto.UserRequestDto;
+import com.defaultServices.securitymanager.dto.UserResponseDto;
+import com.defaultServices.securitymanager.model.Role;
+import com.defaultServices.securitymanager.model.User;
+import com.defaultServices.securitymanager.service.SigninService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -65,14 +74,19 @@ public class SigninServiceImple implements SigninService {
     public ResponseEntity<UserResponseDto> login(UserRequestDto loginDetails) throws BusinessException {
         log.info("Enter into login:SigninServiceImple");
         User user = signinDao.findByEmail(loginDetails.getEmail());
+        System.out.println("user----->"+user);
         boolean password =passwordEncoder.matches(loginDetails.getPassword(), user.getPassword());
+        System.out.println("password----->"+password);
 
         if (password) {
+            System.out.println("<----------password----->"); 
             user.setLoggedinDate(new Date());
             User loginUser= signinDao.saveUser(user);
+            System.out.println("<----------loginUser----->"+loginUser); 
             UserResponseDto userResponseDto = new UserResponseDto();
             BeanUtils.copyProperties(loginUser,userResponseDto);
             log.info("Exit from login:SigninServiceImple ");
+            System.out.println("<----------userResponseDto----->"+userResponseDto); 
             return ResponseEntity.ok(userResponseDto);
         } else {
             log.info("Error from login:SigninServiceImple ");

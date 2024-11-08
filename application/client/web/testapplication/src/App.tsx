@@ -5,6 +5,10 @@ import Login from "./app/login/login";
 import Signup from "./app/signup/signup";
 import Template from "./app/template/template";
 import { ProtectedRoute } from "./protectedroutes";
+import SaveEmployeeScreen from "./app/SaveEmployeeScreen/SaveEmployeeScreen";
+import Sefscreen from "./app/sefscreen/sefscreen";
+import Listemployeescreen from "./app/listemployeescreen/listemployeescreen";
+import Updateemployee from "./app/updateemployee/updateemployee";
 
 
 const App = () => { 
@@ -62,7 +66,30 @@ const App = () => {
             key={2}
             render={(props: any) => <Signup {...props} />}
           />
-        
+          <Route
+            exact
+            path={"/saveemployeescreen"}
+            key={2}
+            render={(props: any) => <SaveEmployeeScreen {...props} />}
+          />
+          <Route
+            exact
+            path={"/sefscreen"}
+            key={2}
+            render={(props: any) => <Sefscreen {...props} />}
+          />
+           <Route
+            exact
+            path={"/updateemployee"}
+            key={2}
+            render={(props: any) => <Updateemployee {...props} />}
+          />
+            <Route
+            exact
+            path={"/listemployeescreen"}
+            key={2}
+            render={(props: any) => <Listemployeescreen {...props} />}
+          />
           <ProtectedRoute>{getRoutes(currentRoutes)}</ProtectedRoute>
         </Switch>
         </Suspense>

@@ -1,20 +1,31 @@
 package com.geppetto.testapplication.controller;
 
-import com.geppetto.testapplication.config.NewConstant;
-import com.geppetto.testapplication.apiAdapter.ApiAdapter;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import java.lang.Exception;
 import java.io.IOException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import io.jsonwebtoken.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.geppetto.testapplication.apiAdapter.ApiAdapter;
+import com.geppetto.testapplication.config.NewConstant;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Header;
+import io.jsonwebtoken.Jwt;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -293,14 +304,22 @@ public ResponseEntity<Object> deleteUser( @PathVariable String id,HttpServletReq
         case "/web":
         ResponseEntity<Object> result=apiAdapter.post(NewConstant.SECURITYURL + "/login" ,object,request);
         Map<String, Object> responseBody = (Map<String,Object>) result.getBody();
+        if (responseBody == null || !responseBody.containsKey("Userdetails")) {
+            // Return a default Userdetails object if it is missing
+            responseBody.put("Userdetails", new HashMap<String, Object>());
+        }
+
         String idToken = (String) responseBody.get("idtoken");
 
-        if (idToken == null || idToken.isEmpty() || idToken == null) {
+        if (idToken == null || idToken.isEmpty()) {
         switch (servletPath) {
         case "/mobile":
         return ResponseEntity.ok().body("Userdetails: " + result.getBody());
         case "/web":
-        return ResponseEntity.ok().body("Userdetails: " + result.getBody());
+        //return ResponseEntity.ok().body("Userdetails: " + result.getBody());
+        System.out.println("Signinresult-->"+result.getBody());
+        System.out.println("SigninresponseBody-->"+responseBody);
+        return ResponseEntity.ok().body(responseBody);
         default:
         return ResponseEntity.ok().body(null);
         }
@@ -334,20 +353,24 @@ public ResponseEntity<Object> deleteUser( @PathVariable String id,HttpServletReq
         }
 
 
-        @PostMapping("consent")
-        public ResponseEntity<Object> consent(@RequestBody Object object,HttpServletRequest request, HttpServletResponse response) throws Exception{
+        @PutMapping("consent")
+        public ResponseEntity<Object> consenet(@RequestBody Object object,HttpServletRequest request, HttpServletResponse response) throws Exception{
+            log.info("Enter into SecurityController : consent");
         try{
-        log.info("Enter into SecurityController.java: consent");
-        String servletPath = request.getContextPath();
-        switch (servletPath) {
-        case "/mobile":
-        case "/web":
-        ResponseEntity<Object> result=apiAdapter.post(NewConstant.SECURITYURL + "/login" ,object,request);
-        Map<String, Object> responseBody = (Map<String, Object>) result.getBody();
-        String token = (String) responseBody.get("idtoken");
+            String servletPath = request.getContextPath();
+                    switch (servletPath) {
+                        case "/mobile":
+                        case "/web":
+          ResponseEntity<Object> result=apiAdapter.put(NewConstant.SECURITYURL + "/consent" ,object,request);
+          Map<String, Object> responseBody = (Map<String,Object>) result.getBody();
+        if (responseBody == null || !responseBody.containsKey("Userdetails")) {
+            responseBody.put("Userdetails", new HashMap<String, Object>());
+        }
 
-        int i = token.lastIndexOf('.');
-        String withoutSignature = token.substring(0, i+1);
+        String idToken = (String) responseBody.get("idtoken");
+        String loggedinDate = (String) responseBody.get("loggedinDate");
+        int i = idToken.lastIndexOf('.');
+        String withoutSignature = idToken.substring(0, i+1);
         Jwt<Header,Claims> headerClaimsJwt = Jwts.parser().parseClaimsJwt(withoutSignature);
 
         Map<String, Object> user = new HashMap<>();
@@ -357,22 +380,27 @@ public ResponseEntity<Object> deleteUser( @PathVariable String id,HttpServletReq
         user.put("id", headerClaimsJwt.getBody().get("id"));
         user.put("username", headerClaimsJwt.getBody().get("sub"));
         user.put("email", headerClaimsJwt.getBody().get("email"));
-
+        user.put("idtoken", idToken);
+        user.put("loggedinDate", loggedinDate);
+        
         ResponseEntity<Object> authProxyResponse= apiAdapter.post(NewConstant.AUTHPROXYURL + "/proxy" ,user,request);
         Map<String, Object> res = new HashMap<>();
         res.put("Access", authProxyResponse.getBody());
-        res.put("Userdetails", user);;
+        res.put("Userdetails", user);
         return ResponseEntity.ok(res);
-        default:
-        String errorMessage = "Invalid servlet path: " + servletPath;
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+          default:
+                    String errorMessage = "Invalid servlet path: " + servletPath;
+                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+                    }
         }
-        } catch (Exception e) {
-        log.info("Exit from  SecurityController.java: consent");
+        catch(Exception e){
+        log.info("Exit into SecurityController : consent");
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+            
+        
         }
-        }
+    }
 
 
     }

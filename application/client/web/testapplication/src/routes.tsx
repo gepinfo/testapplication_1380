@@ -26,7 +26,7 @@ let routes: any = [
 { path: '/managecontrol', component: Managecontrol },
 { path: '/usermanagement', component: User },
 { path: '/profile', component: ProfilesettingsComponent },
-{ path : '/saveemployeescreen', component: lazy(()=>import('./app/saveemployeescreen/saveemployeescreen')) },
+{ path : '/saveemployeescreen', component: lazy(()=>import('./app/SaveEmployeeScreen/SaveEmployeeScreen')) },
 { path : '/listemployeescreen', component: lazy(()=>import('./app/listemployeescreen/listemployeescreen')) },
 { path : '/updateemployee', component: lazy(()=>import('./app/updateemployee/updateemployee')) },
 { path: "", component: Template }
